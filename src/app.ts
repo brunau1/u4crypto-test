@@ -7,11 +7,6 @@ import * as Hapi from '@hapi/hapi';
 import * as DB from './database/postgre';
 import AuthRoutes from './routes/auth.routes';
 import CustomerRoutes from './routes/customer.routes';
-import JWT from './utils/jwt';
-
-const test = JWT.generateToken('brunoelindodemaisdaconta');
-const res = JWT.verify(test);
-console.log(res);
 
 export async function init(server: Hapi.Server) {
 	CustomerRoutes(server);
