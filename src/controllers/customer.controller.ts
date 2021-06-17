@@ -9,7 +9,7 @@ import JWT from '../utils/jwt';
 import AuthService from '../services/auth.service';
 
 export default class CustomerController {
-	public async findCustomers(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async find(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		try {
 			const authorized = AuthService.verifyRoleAuthorization(
 				request.headers.authorization,
@@ -20,17 +20,15 @@ export default class CustomerController {
 			const customers = await CustomerService.findAllCustomers();
 			return h
 				.response({
+					message: 'Found',
 					data: customers,
 				})
-				.code(201);
+				.code(200);
 		} catch (error) {
 			return Boom.notFound(error.message);
 		}
 	}
-	public async createCustomer(
-		request: ICreateCustomer,
-		h: Hapi.ResponseToolkit
-	) {
+	public async create(request: ICreateCustomer, h: Hapi.ResponseToolkit) {
 		try {
 			const { email } = request.payload;
 			await CustomerService.verifyExistingCustomer(email);
@@ -46,10 +44,7 @@ export default class CustomerController {
 		}
 	}
 
-	public async updateCustomer(
-		request: IUpdateCustomer,
-		h: Hapi.ResponseToolkit
-	) {
+	public async update(request: IUpdateCustomer, h: Hapi.ResponseToolkit) {
 		try {
 			const authorized = AuthService.verifyUserIdentity(
 				request.headers.authorization,
@@ -62,7 +57,26 @@ export default class CustomerController {
 				.response({
 					message: 'Updated',
 				})
-				.code(201);
+				.code(200);
+		} catch (error) {
+			return Boom.notFound(error.message);
+		}
+	}
+	public async delete(request: IUpdateCustomer, h: Hapi.ResponseToolkit) {
+		try {
+			const { id } = request.payload;
+			const authorized = AuthService.verifyUserIdentity(
+				request.headers.authorization,
+				id
+			);
+			if (!authorized)
+				return Boom.unauthorized('Customers can delete only your own data');
+			await CustomerService.deleteCustomer(id);
+			return h
+				.response({
+					message: 'Deleted',
+				})
+				.code(200);
 		} catch (error) {
 			return Boom.notFound(error.message);
 		}

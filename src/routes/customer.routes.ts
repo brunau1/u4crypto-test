@@ -10,10 +10,10 @@ export default function (server: Hapi.Server) {
 		method: 'POST',
 		path: '/customer',
 		options: {
-			handler: controller.createCustomer,
+			handler: controller.create,
 			auth: false,
 			validate: {
-				payload: CustomerValidation.createUserModel,
+				payload: CustomerValidation.createCustomerModel,
 			},
 			description: 'Create a customer and generate the access token.',
 		},
@@ -23,7 +23,7 @@ export default function (server: Hapi.Server) {
 		method: 'GET',
 		path: '/customer',
 		options: {
-			handler: controller.findCustomers,
+			handler: controller.find,
 			auth: 'jwt',
 			validate: {
 				headers: AuthValidation.jwtValidator,
@@ -36,13 +36,27 @@ export default function (server: Hapi.Server) {
 		method: 'PUT',
 		path: '/customer',
 		options: {
-			handler: controller.updateCustomer,
+			handler: controller.update,
 			auth: 'jwt',
 			validate: {
 				headers: AuthValidation.jwtValidator,
-				payload: CustomerValidation.updateUserModel,
+				payload: CustomerValidation.updateCustomerModel,
 			},
 			description: 'Update a customer.',
+		},
+	});
+
+	server.route({
+		method: 'DELETE',
+		path: '/customer',
+		options: {
+			handler: controller.delete,
+			auth: 'jwt',
+			validate: {
+				headers: AuthValidation.jwtValidator,
+				payload: CustomerValidation.deleteCustomerModel,
+			},
+			description: 'Delete a customer.',
 		},
 	});
 }

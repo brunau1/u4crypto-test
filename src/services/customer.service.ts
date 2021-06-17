@@ -20,6 +20,12 @@ export default class CustomerService {
 		const repository = connection.getRepository(Customer);
 		return await repository.find();
 	}
+
+	static async deleteCustomer(id: string) {
+		const connection = getConnection();
+		const repository = connection.getRepository(Customer);
+		await repository.delete({ id: id });
+	}
 	static async saveCustomer(request: ICreateCustomer) {
 		try {
 			const { role, name, cpf, email, birthday } = request.payload;
@@ -29,7 +35,7 @@ export default class CustomerService {
 			const customer = new Customer();
 			customer.id = uuid().toString();
 			customer.cpf = cpf;
-			customer.role = role;
+			customer.role = role || 'customer';
 			customer.name = name;
 			customer.email = email;
 			customer.birthday = new Date(birthday).toISOString();
