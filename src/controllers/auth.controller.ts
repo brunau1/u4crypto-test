@@ -10,8 +10,11 @@ export default class AuthController {
 	public async login(request: ILoginRequest, h: Hapi.ResponseToolkit) {
 		try {
 			const { email, password } = request.payload;
-			const id = await AuthService.verifyCustomerLogin(email, password);
-			return h.response({ token: JWT.generateToken(id) }).code(200);
+			const customerInfo = await AuthService.verifyCustomerLogin(
+				email,
+				password
+			);
+			return h.response({ token: JWT.generateToken(customerInfo) }).code(200);
 		} catch (error) {
 			return Boom.unauthorized(error.message);
 		}
@@ -23,7 +26,7 @@ export default class AuthController {
 	) {
 		const connection = getConnection();
 		const repository = connection.getRepository(Customer);
-		const customer = await repository.findOne(decoded.id);
+		const customer = await repository.findOne(decoded['id']);
 		if (!customer) return { isValid: false };
 		return { isValid: true };
 	}

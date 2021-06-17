@@ -1,6 +1,7 @@
 interface ICreateCustomer {
 	payload: {
 		cpf: string;
+		role: string;
 		name: string;
 		email: string;
 		birthday: string;
@@ -8,4 +9,13 @@ interface ICreateCustomer {
 	};
 }
 
-export { ICreateCustomer };
+interface IUpdateCustomer {
+	payload: {
+		id: string;
+		cpf: string;
+		name: string;
+		birthday: string;
+	};
+}
+
+export { ICreateCustomer, IUpdateCustomer };

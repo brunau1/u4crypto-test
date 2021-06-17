@@ -1,18 +1,26 @@
 import * as Jwt from 'jsonwebtoken';
 import * as Hapi from '@hapi/hapi';
 import AuthController from '../controllers/auth.controller';
+
+interface JWTInfo {
+	id: string;
+	role: string;
+}
 export default class JWT {
-	static generateToken(id: string) {
+	static generateToken(customerInfo: JWTInfo) {
 		const { JWT_SECRET, JWT_EXPIRATION } = process.env;
-		return Jwt.sign({ id }, JWT_SECRET, {
-			algorithm: 'HS256',
-			expiresIn: JWT_EXPIRATION,
-		});
+		return Jwt.sign(
+			{ id: customerInfo.id, role: customerInfo.role },
+			JWT_SECRET,
+			{
+				algorithm: 'HS256',
+				expiresIn: JWT_EXPIRATION,
+			}
+		);
 	}
-	static verify(token: string) {
+	static decode(token: string) {
 		try {
-			const { JWT_SECRET } = process.env;
-			const verified = Jwt.verify(token, JWT_SECRET);
+			const verified = Jwt.decode(token);
 			return verified;
 		} catch (error) {
 			throw { message: 'Invalid jwt token' };

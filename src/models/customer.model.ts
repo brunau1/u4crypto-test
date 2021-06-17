@@ -7,6 +7,9 @@ export default class Customer {
 	id: string;
 
 	@Column()
+	role: string;
+
+	@Column()
 	name: string;
 
 	@Column()

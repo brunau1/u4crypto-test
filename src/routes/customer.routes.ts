@@ -1,4 +1,5 @@
 import * as Hapi from '@hapi/hapi';
+import * as AuthValidation from '../validations/auth.validator';
 import * as CustomerValidation from '../validations/customer.validator';
 import CustomerController from '../controllers/customer.controller';
 
@@ -15,6 +16,33 @@ export default function (server: Hapi.Server) {
 				payload: CustomerValidation.createUserModel,
 			},
 			description: 'Create a customer and generate the access token.',
+		},
+	});
+
+	server.route({
+		method: 'GET',
+		path: '/customer',
+		options: {
+			handler: controller.findCustomers,
+			auth: 'jwt',
+			validate: {
+				headers: AuthValidation.jwtValidator,
+			},
+			description: 'Get all customers',
+		},
+	});
+
+	server.route({
+		method: 'PUT',
+		path: '/customer',
+		options: {
+			handler: controller.updateCustomer,
+			auth: 'jwt',
+			validate: {
+				headers: AuthValidation.jwtValidator,
+				payload: CustomerValidation.updateUserModel,
+			},
+			description: 'Update a customer.',
 		},
 	});
 }
