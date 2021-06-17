@@ -19,4 +19,10 @@ export default class AuthService {
 		if (decoded['role'] != neededRole) return false;
 		return true;
 	}
+
+	static verifyUserIdentity(authorization: string, id: string) {
+		const decoded = JWT.decode(authorization);
+		if (decoded['role'] != 'admin' && decoded['id'] != id) return false;
+		return true;
+	}
 }

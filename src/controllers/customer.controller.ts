@@ -51,6 +51,12 @@ export default class CustomerController {
 		h: Hapi.ResponseToolkit
 	) {
 		try {
+			const authorized = AuthService.verifyUserIdentity(
+				request.headers.authorization,
+				request.payload.id
+			);
+			if (!authorized)
+				return Boom.unauthorized('Customers can update only your own data');
 			await CustomerService.updateCustomer(request);
 			return h
 				.response({

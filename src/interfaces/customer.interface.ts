@@ -10,6 +10,7 @@ interface ICreateCustomer {
 }
 
 interface IUpdateCustomer {
+	headers: { authorization: string };
 	payload: {
 		id: string;
 		cpf: string;

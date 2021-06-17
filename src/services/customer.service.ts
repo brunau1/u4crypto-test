@@ -50,7 +50,7 @@ export default class CustomerService {
 			if (!customer) throw { message: 'Customer not found' };
 			customer.name = name;
 			customer.cpf = cpf;
-			customer.birthday = birthday;
+			customer.birthday = new Date(birthday).toISOString();
 			await repository.update({ id: id }, customer);
 		} catch (error) {
 			throw { message: error.message };
