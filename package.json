@@ -7,9 +7,9 @@
 		"test": "tests"
 	},
 	"scripts": {
-		"start": "node ./dist/app.js",
+		"start": "node ./dist/server.js",
 		"build": "tsc",
-		"dev": "ts-node ./src/app.ts"
+		"dev": "ts-node ./src/server.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -36,6 +36,8 @@
 		"@hapi/hapi": "^20.1.4",
 		"crypto-js": "^4.0.0",
 		"dotenv-safe": "^8.2.0",
+		"hapi-auth-jwt2": "^10.2.0",
+		"joi": "^17.4.0",
 		"jsonwebtoken": "^8.5.1",
 		"pg": "^8.6.0",
 		"typeorm": "^0.2.34",

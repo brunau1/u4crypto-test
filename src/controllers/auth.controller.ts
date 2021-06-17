@@ -1,29 +1,30 @@
 import * as Hapi from '@hapi/hapi';
 import * as Boom from '@hapi/boom';
-import * as TypeORM from 'typeorm';
 import { getConnection } from 'typeorm';
 import { ILoginRequest } from '../interfaces/auth.interface';
 import JWT from '../utils/jwt';
 import Customer from '../models/customer.model';
-import Crypto from '../utils/crypto';
-import { validateRequest } from '../validations/util.validate';
+import AuthService from '../services/auth.service';
 
 export default class AuthController {
-	private connection: TypeORM.Connection;
-
-	constructor() {
-		this.connection = TypeORM.getConnection();
-	}
 	public async login(request: ILoginRequest, h: Hapi.ResponseToolkit) {
-		validateRequest(request.payload);
-		const { email, password } = request.payload;
+		try {
+			const { email, password } = request.payload;
+			const id = await AuthService.verifyCustomerLogin(email, password);
+			return h.response({ token: JWT.generateToken(id) }).code(200);
+		} catch (error) {
+			return Boom.unauthorized(error.message);
+		}
+	}
+	static async validateUser(
+		decoded: any,
+		request: Hapi.Request,
+		h: Hapi.ResponseToolkit
+	) {
 		const connection = getConnection();
 		const repository = connection.getRepository(Customer);
-		const customer = await repository.findOne({ email: email });
-
-		if (Crypto.decrypt(customer.password) != password)
-			return Boom.unauthorized('Password is invalid.');
-
-		return h.response({ token: JWT.generateToken(customer.id) }).code(200);
+		const customer = await repository.findOne(decoded.id);
+		if (!customer) return { isValid: false };
+		return { isValid: true };
 	}
 }

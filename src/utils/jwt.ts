@@ -1,7 +1,6 @@
 import * as Jwt from 'jsonwebtoken';
 import * as Hapi from '@hapi/hapi';
-import { getConnection } from 'typeorm';
-import Customer from '../models/customer.model';
+import AuthController from '../controllers/auth.controller';
 export default class JWT {
 	static generateToken(id: string) {
 		const { JWT_SECRET, JWT_EXPIRATION } = process.env;
@@ -22,21 +21,8 @@ export default class JWT {
 
 	static async register(server: Hapi.Server) {
 		try {
-			const connection = getConnection();
-			const repository = connection.getRepository(Customer);
-			const validateUser = async (
-				decoded: any,
-				request: Hapi.Request,
-				h: Hapi.ResponseToolkit
-			) => {
-				const customer = await repository.findOne(decoded.id);
-				if (!customer) return { isValid: false };
-				return { isValid: true };
-			};
-
 			await server.register(require('hapi-auth-jwt2'));
-
-			return this.setAuthStrategy(server, validateUser);
+			return this.setAuthStrategy(server, AuthController.validateUser);
 		} catch (err) {
 			console.log(`Error registering jwt plugin: ${err}`);
 			throw err;

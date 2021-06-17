@@ -1,12 +1,8 @@
 import * as Hapi from '@hapi/hapi';
 import * as Boom from '@hapi/boom';
-import { v4 as uuid } from 'uuid';
-import { getConnection } from 'typeorm';
 import { ICreateCustomer } from '../interfaces/customer.interface';
-import Customer from '../models/customer.model';
-import Crypto from '../utils/crypto';
+import CustomerService from '../services/customer.service';
 import JWT from '../utils/jwt';
-import { validateRequest } from '../validations/util.validate';
 
 export default class CustomerController {
 	public async createCustomer(
@@ -14,23 +10,13 @@ export default class CustomerController {
 		h: Hapi.ResponseToolkit
 	) {
 		try {
-			validateRequest(request.payload);
-			const { name, cpf, email, birthday } = request.payload;
-			const password = Crypto.encrypt(request.payload.password);
-			const connection = getConnection();
-			const repository = connection.getRepository(Customer);
-			const customer = new Customer();
-			customer.id = uuid().toString();
-			customer.name = name;
-			customer.cpf = cpf;
-			customer.email = email;
-			customer.birthday = new Date(birthday).toISOString();
-			customer.password = password;
-			repository.save(customer);
+			const { email } = request.payload;
+			await CustomerService.verifyExistingCustomer(email);
+			const id = await CustomerService.saveCustomerData(request);
 			return h
 				.response({
 					message: 'Created',
-					token: JWT.generateToken(customer.id),
+					token: JWT.generateToken(id),
 				})
 				.code(201);
 		} catch (error) {
