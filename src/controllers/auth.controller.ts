@@ -14,7 +14,11 @@ export default class AuthController {
 				email,
 				password
 			);
-			return h.response({ token: JWT.generateToken(customerInfo) }).code(200);
+			return h
+				.response({
+					token: JWT.generateToken(customerInfo),
+				})
+				.code(200);
 		} catch (error) {
 			return Boom.unauthorized(error.message);
 		}

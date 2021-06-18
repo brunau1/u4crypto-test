@@ -13,10 +13,16 @@ interface IUpdateCustomer {
 	headers: { authorization: string };
 	payload: {
 		id: string;
-		cpf: string;
 		name: string;
 		birthday: string;
 	};
 }
 
-export { ICreateCustomer, IUpdateCustomer };
+interface IDeleteCustomer {
+	headers: { authorization: string };
+	payload: {
+		id: string;
+	};
+}
+
+export { ICreateCustomer, IDeleteCustomer, IUpdateCustomer };

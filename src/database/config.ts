@@ -2,7 +2,7 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 
 import Appointment from '../models/accident.model';
 import Customer from '../models/customer.model';
-import ThirdCustomer from '../models/thirdCustomer.model';
+import Third from '../models/third.model';
 
 const typeOrmConfig: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -13,7 +13,7 @@ const typeOrmConfig: PostgresConnectionOptions = {
 	database: 'test_u4crypto',
 	synchronize: true,
 	logging: false,
-	entities: [Appointment, Customer, ThirdCustomer],
+	entities: [Appointment, Customer, Third],
 };
 
 export default typeOrmConfig;

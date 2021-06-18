@@ -1,75 +1,75 @@
 import * as Hapi from '@hapi/hapi';
 import * as AuthValidation from '../validations/auth.validator';
-import * as CustomerValidation from '../validations/customer.validator';
-import CustomerController from '../controllers/customer.controller';
+import * as ThirdValidation from '../validations/third.validator';
+import ThirdController from '../controllers/third.controller';
 
 export default function (server: Hapi.Server) {
-	const controller = new CustomerController();
+	const controller = new ThirdController();
 	server.bind(controller);
 	server.route({
 		method: 'POST',
-		path: '/customer',
+		path: '/third',
 		options: {
 			handler: controller.create,
-			auth: false,
+			auth: 'jwt',
 			validate: {
-				payload: CustomerValidation.createCustomerModel,
+				payload: ThirdValidation.createThirdModel,
 			},
-			description: 'Create a customer and generate the access token.',
+			description: 'Create a third.',
 		},
 	});
 
 	server.route({
 		method: 'GET',
-		path: '/customer',
+		path: '/third/{cpf}',
 		options: {
 			handler: controller.find,
 			auth: 'jwt',
 			validate: {
 				headers: AuthValidation.jwtValidator,
 			},
-			description: 'Get a customer by id',
+			description: 'find a third by id',
 		},
 	});
 
 	server.route({
 		method: 'GET',
-		path: '/customer/all',
+		path: '/third/all',
 		options: {
 			handler: controller.findAll,
 			auth: 'jwt',
 			validate: {
 				headers: AuthValidation.jwtValidator,
 			},
-			description: 'Get all customers',
+			description: 'Get all third',
 		},
 	});
 
 	server.route({
 		method: 'PUT',
-		path: '/customer',
+		path: '/third',
 		options: {
 			handler: controller.update,
 			auth: 'jwt',
 			validate: {
 				headers: AuthValidation.jwtValidator,
-				payload: CustomerValidation.updateCustomerModel,
+				payload: ThirdValidation.updateThirdModel,
 			},
-			description: 'Update a customer.',
+			description: 'Update a third.',
 		},
 	});
 
 	server.route({
 		method: 'DELETE',
-		path: '/customer',
+		path: '/third',
 		options: {
 			handler: controller.delete,
 			auth: 'jwt',
 			validate: {
 				headers: AuthValidation.jwtValidator,
-				payload: CustomerValidation.deleteCustomerModel,
+				payload: ThirdValidation.deleteThirdModel,
 			},
-			description: 'Delete a customer.',
+			description: 'Delete a third.',
 		},
 	});
 }

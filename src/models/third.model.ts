@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
 import Accident from './accident.model';
 
 @Entity()
-export default class ThirdCustomer {
+export default class Third {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -10,11 +10,11 @@ export default class ThirdCustomer {
 	name: string;
 
 	@Column()
-	birthday: string;
-
-	@Column()
 	cpf: string;
 
-	@ManyToMany((type) => Accident, (accident) => accident.thirdCustomers)
+	@Column()
+	birthday: string;
+
+	@ManyToMany((type) => Accident, (accident) => accident.third)
 	accidents: Accident[];
 }

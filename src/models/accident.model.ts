@@ -8,7 +8,7 @@ import {
 	JoinTable,
 } from 'typeorm';
 import Customer from './customer.model';
-import ThirdCustomer from './thirdCustomer.model';
+import Third from './third.model';
 
 @Entity()
 export default class Accident {
@@ -28,13 +28,9 @@ export default class Accident {
 	@JoinColumn()
 	customer: Customer;
 
-	@ManyToMany(
-		(type) => ThirdCustomer,
-		(thirdCustomer) => thirdCustomer.accidents,
-		{
-			cascade: true,
-		}
-	)
+	@ManyToMany((type) => Third, (Third) => Third.accidents, {
+		cascade: true,
+	})
 	@JoinTable()
-	thirdCustomers: ThirdCustomer[];
+	third: Third[];
 }

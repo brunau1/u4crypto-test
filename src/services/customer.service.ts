@@ -6,19 +6,20 @@ import {
 import { v4 as uuid } from 'uuid';
 import Customer from '../models/customer.model';
 import Crypto from '../utils/crypto';
+import JWT from '../utils/jwt';
 
 export default class CustomerService {
-	static async verifyExistingCustomer(email) {
-		const connection = getConnection();
-		const repository = connection.getRepository(Customer);
-		if (await repository.findOne({ email: email }))
-			throw { message: 'Customer email already registered' };
-	}
-
 	static async findAllCustomers() {
 		const connection = getConnection();
 		const repository = connection.getRepository(Customer);
 		return await repository.find();
+	}
+
+	static async findCustomerById(authorization) {
+		const decoded = JWT.decode(authorization);
+		const connection = getConnection();
+		const repository = connection.getRepository(Customer);
+		return await repository.findOne(decoded['id']);
 	}
 
 	static async deleteCustomer(id: string) {
@@ -49,13 +50,12 @@ export default class CustomerService {
 
 	static async updateCustomer(request: IUpdateCustomer) {
 		try {
-			const { id, name, cpf, birthday } = request.payload;
+			const { id, name, birthday } = request.payload;
 			const connection = getConnection();
 			const repository = connection.getRepository(Customer);
 			const customer: Customer = await repository.findOne(id);
 			if (!customer) throw { message: 'Customer not found' };
 			customer.name = name;
-			customer.cpf = cpf;
 			customer.birthday = new Date(birthday).toISOString();
 			await repository.update({ id: id }, customer);
 		} catch (error) {
