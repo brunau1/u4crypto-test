@@ -62,4 +62,13 @@ export default class CustomerService {
 			throw { message: error.message };
 		}
 	}
+
+	static async verifyExistingCustomer(cpf: string, email?: string) {
+		const connection = getConnection();
+		const repository = connection.getRepository(Customer);
+		if (email && (await repository.findOne({ email: email })))
+			throw { message: 'A customer with the same email is already registered' };
+		if (await repository.findOne({ cpf: cpf }))
+			throw { message: 'A customer with the same CPF is already registered' };
+	}
 }

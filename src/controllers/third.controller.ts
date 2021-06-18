@@ -42,7 +42,7 @@ export default class ThirdController {
 	public async create(request: ICreateThird, h: Hapi.ResponseToolkit) {
 		try {
 			const { cpf } = request.payload;
-			await AuthService.verifyExistingUser(cpf);
+			await ThirdService.verifyExistingThird(cpf);
 			const id = await ThirdService.saveThird(request);
 			return h
 				.response({

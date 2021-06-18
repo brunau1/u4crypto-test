@@ -48,4 +48,11 @@ export default class ThirdService {
 		await repository.save(third);
 		return third.id;
 	}
+
+	static async verifyExistingThird(cpf: string) {
+		const connection = getConnection();
+		const repository = connection.getRepository(Third);
+		if (await repository.findOne({ cpf: cpf }))
+			throw { message: 'A third with the same CPF is already registered' };
+	}
 }

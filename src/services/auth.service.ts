@@ -14,18 +14,6 @@ export default class AuthService {
 			throw { message: 'Password is invalid.' };
 		return { id: customer.id, role: customer.role };
 	}
-
-	static async verifyExistingUser(cpf: string, email?: string) {
-		const connection = getConnection();
-		const cRepository = connection.getRepository(Customer);
-		const tRepository = connection.getRepository(Third);
-		if (email && (await cRepository.findOne({ email: email })))
-			throw { message: 'A user with the same email is already registered' };
-		if (await cRepository.findOne({ cpf: cpf }))
-			throw { message: 'A user with the same CPF is already registered' };
-		if (await tRepository.findOne({ cpf: cpf }))
-			throw { message: 'A third with the same CPF is already registered' };
-	}
 	static verifyRoleAuthorization(authorization: string, neededRole: string) {
 		const decoded = JWT.decode(authorization);
 		if (decoded['role'] != neededRole) return false;

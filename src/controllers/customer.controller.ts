@@ -44,7 +44,7 @@ export default class CustomerController {
 	public async create(request: ICreateCustomer, h: Hapi.ResponseToolkit) {
 		try {
 			const { email, cpf } = request.payload;
-			await AuthService.verifyExistingUser(cpf, email);
+			await CustomerService.verifyExistingCustomer(cpf, email);
 			const customerInfo = await CustomerService.saveCustomer(request);
 			return h
 				.response({
@@ -56,7 +56,6 @@ export default class CustomerController {
 			return Boom.badRequest(error.message);
 		}
 	}
-	//TODO rota para criar a partir de um third existente
 	public async update(request: IUpdateCustomer, h: Hapi.ResponseToolkit) {
 		try {
 			const authorized = AuthService.verifyUserIdentity(
