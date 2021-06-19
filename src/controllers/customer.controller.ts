@@ -8,6 +8,7 @@ import {
 import CustomerService from '../services/customer.service';
 import JWT from '../utils/jwt';
 import AuthService from '../services/auth.service';
+import ProfileService from '../services/profile.service';
 
 export default class CustomerController {
 	public async find(request: Hapi.Request, h: Hapi.ResponseToolkit) {
@@ -44,8 +45,11 @@ export default class CustomerController {
 	public async create(request: ICreateCustomer, h: Hapi.ResponseToolkit) {
 		try {
 			const { email, cpf } = request.payload;
-			await CustomerService.verifyExistingCustomer(cpf, email);
-			const customerInfo = await CustomerService.saveCustomer(request);
+			const existingProfile = await AuthService.verifyExistingUser(cpf, email);
+			const customerInfo = await CustomerService.saveCustomer(
+				request,
+				existingProfile
+			);
 			return h
 				.response({
 					message: 'Created',
@@ -64,7 +68,7 @@ export default class CustomerController {
 			);
 			if (!authorized)
 				return Boom.unauthorized('Customers can update only your own data');
-			await CustomerService.updateCustomer(request);
+			await ProfileService.updateProfile(request, 'customer');
 			return h
 				.response({
 					message: 'Updated',

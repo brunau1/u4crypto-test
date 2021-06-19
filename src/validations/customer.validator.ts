@@ -2,7 +2,7 @@ import * as Joi from 'joi';
 
 export const createCustomerModel = Joi.object().keys({
 	cpf: Joi.string().required(),
-	role: Joi.string(),
+	role: Joi.string().required(),
 	name: Joi.string().required(),
 	email: Joi.string().email().trim().required(),
 	birthday: Joi.string().required(),

@@ -7,68 +7,77 @@ import { v4 as uuid } from 'uuid';
 import Customer from '../models/customer.model';
 import Crypto from '../utils/crypto';
 import JWT from '../utils/jwt';
+import ProfileService from './profile.service';
+import Profile from '../models/profile.model';
 
 export default class CustomerService {
 	static async findAllCustomers() {
 		const connection = getConnection();
-		const repository = connection.getRepository(Customer);
-		return await repository.find();
+		const cRepository = connection.getRepository(Customer);
+		const pRepository = connection.getRepository(Profile);
+		const customers = await cRepository.find();
+		const foundCustomers = [];
+		for (const customer of customers) {
+			const profile = await pRepository.findOne(
+				{ customerId: customer.id },
+				{ select: ['cpf', 'name', 'birthday'] }
+			);
+			foundCustomers.push({ ...profile, ...customer });
+		}
+		return foundCustomers;
 	}
 
 	static async findCustomerById(authorization) {
 		const decoded = JWT.decode(authorization);
 		const connection = getConnection();
-		const repository = connection.getRepository(Customer);
-		return await repository.findOne(decoded['id']);
+		const cRepository = connection.getRepository(Customer);
+		const pRepository = connection.getRepository(Profile);
+		const profile = await pRepository.findOne(
+			{ customerId: decoded['id'] },
+			{ select: ['cpf', 'name', 'birthday'] }
+		);
+		const customer = await cRepository.findOne(decoded['id']);
+		return { ...profile, ...customer };
 	}
 
 	static async deleteCustomer(id: string) {
 		const connection = getConnection();
-		const repository = connection.getRepository(Customer);
-		await repository.delete({ id: id });
+		const cRepository = connection.getRepository(Customer);
+		const pRepository = connection.getRepository(Profile);
+		const profile = await pRepository.findOne({ customerId: id });
+		profile.customerId = null;
+		await cRepository.delete({ id: id });
+		await pRepository.update({ id: profile.id }, profile);
 	}
-	static async saveCustomer(request: ICreateCustomer) {
+	static async saveCustomer(request: ICreateCustomer, profile: Profile) {
 		try {
-			const { role, name, cpf, email, birthday } = request.payload;
+			const { role, email } = request.payload;
 			const connection = getConnection();
 			const repository = connection.getRepository(Customer);
 			const password = Crypto.encrypt(request.payload.password);
 			const customer = new Customer();
 			customer.id = uuid().toString();
-			customer.cpf = cpf;
-			customer.role = role || 'customer';
-			customer.name = name;
+			let profileId = null;
+			if (profile) {
+				profileId = profile.id;
+				if (!profile.customerId) {
+					profile.customerId = customer.id;
+					connection.getRepository(Profile).update({ id: profile.id }, profile);
+				}
+			} else
+				profileId = await ProfileService.createProfile(
+					request,
+					customer.id,
+					null
+				);
+			customer.role = role;
 			customer.email = email;
-			customer.birthday = new Date(birthday).toISOString();
 			customer.password = password;
+			customer.profileId = profileId;
 			await repository.save(customer);
 			return { id: customer.id, role: customer.role };
 		} catch (error) {
 			throw { message: 'Failed to save customer' };
 		}
-	}
-
-	static async updateCustomer(request: IUpdateCustomer) {
-		try {
-			const { id, name, birthday } = request.payload;
-			const connection = getConnection();
-			const repository = connection.getRepository(Customer);
-			const customer: Customer = await repository.findOne(id);
-			if (!customer) throw { message: 'Customer not found' };
-			customer.name = name;
-			customer.birthday = new Date(birthday).toISOString();
-			await repository.update({ id: id }, customer);
-		} catch (error) {
-			throw { message: error.message };
-		}
-	}
-
-	static async verifyExistingCustomer(cpf: string, email?: string) {
-		const connection = getConnection();
-		const repository = connection.getRepository(Customer);
-		if (email && (await repository.findOne({ email: email })))
-			throw { message: 'A customer with the same email is already registered' };
-		if (await repository.findOne({ cpf: cpf }))
-			throw { message: 'A customer with the same CPF is already registered' };
 	}
 }

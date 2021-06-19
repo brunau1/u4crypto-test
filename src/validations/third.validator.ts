@@ -7,11 +7,11 @@ export const createThirdModel = Joi.object().keys({
 });
 
 export const updateThirdModel = Joi.object().keys({
-	cpf: Joi.string().required(),
+	id: Joi.string().required(),
 	name: Joi.string().required(),
 	birthday: Joi.string().required(),
 });
 
 export const deleteThirdModel = Joi.object().keys({
-	cpf: Joi.string().required(),
+	id: Joi.string().required(),
 });

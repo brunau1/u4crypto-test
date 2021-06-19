@@ -8,7 +8,7 @@ interface ICreateThird {
 
 interface IUpdateThird {
 	payload: {
-		cpf: string;
+		id: string;
 		name: string;
 		birthday: string;
 	};
@@ -17,7 +17,7 @@ interface IUpdateThird {
 interface IDeleteThird {
 	headers: { authorization: string };
 	payload: {
-		cpf: string;
+		id: string;
 	};
 }
 

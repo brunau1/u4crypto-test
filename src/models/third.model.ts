@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	ManyToMany,
+	OneToOne,
+	JoinColumn,
+} from 'typeorm';
 import Accident from './accident.model';
 
 @Entity()
@@ -7,13 +14,7 @@ export default class Third {
 	id: string;
 
 	@Column()
-	name: string;
-
-	@Column()
-	cpf: string;
-
-	@Column()
-	birthday: string;
+	profileId: string;
 
 	@ManyToMany((type) => Accident, (accident) => accident.third)
 	accidents: Accident[];

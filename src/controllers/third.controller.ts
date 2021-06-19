@@ -7,6 +7,7 @@ import {
 	IDeleteThird,
 	IUpdateThird,
 } from '../interfaces/third.interface';
+import ProfileService from '../services/profile.service';
 
 export default class ThirdController {
 	public async find(request: Hapi.Request, h: Hapi.ResponseToolkit) {
@@ -42,8 +43,8 @@ export default class ThirdController {
 	public async create(request: ICreateThird, h: Hapi.ResponseToolkit) {
 		try {
 			const { cpf } = request.payload;
-			await ThirdService.verifyExistingThird(cpf);
-			const id = await ThirdService.saveThird(request);
+			const existingProfile = await AuthService.verifyExistingUser(cpf);
+			const id = await ThirdService.saveThird(request, existingProfile);
 			return h
 				.response({
 					message: 'Created',
@@ -56,7 +57,7 @@ export default class ThirdController {
 	}
 	public async update(request: IUpdateThird, h: Hapi.ResponseToolkit) {
 		try {
-			await ThirdService.updateThird(request);
+			await ProfileService.updateProfile(request, 'third');
 			return h
 				.response({
 					message: 'Updated',
@@ -68,8 +69,8 @@ export default class ThirdController {
 	}
 	public async delete(request: IDeleteThird, h: Hapi.ResponseToolkit) {
 		try {
-			const { cpf } = request.payload;
-			await ThirdService.deleteThird(cpf);
+			const { id } = request.payload;
+			await ThirdService.deleteThird(id);
 			return h
 				.response({
 					message: 'Deleted',
